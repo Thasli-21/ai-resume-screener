@@ -21,6 +21,8 @@ _PATTERNS = _build_patterns()
 
 def extract_skills(text: str) -> set:
     """Step 2: find which known skills appear in the text."""
+    # PDFs often break phrases across lines ("front\noffice"), so flatten whitespace first
+    text = re.sub(r"\s+", " ", text)
     return {skill for skill, pat in _PATTERNS.items() if pat.search(text)}
 
 
