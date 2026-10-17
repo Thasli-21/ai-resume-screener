@@ -119,4 +119,8 @@ SKILLS = {
     # Health and education
     "patient care": ["nursing", "patient handling"],
     "teaching": ["lesson planning", "classroom management", "tutoring"],
+    # Extra roles
+    "software testing": ["manual testing", "automation testing", "selenium", "test cases", "qa testing"],
+    "ui/ux design": ["ux design", "ui design", "figma", "wireframing", "prototyping"],
+    "human resources": ["hr operations", "employee relations", "onboarding", "payroll"],
 }

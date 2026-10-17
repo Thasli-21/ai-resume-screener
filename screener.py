@@ -6,7 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from skills_db import SKILLS
-from parser import education_level, required_years
+from parser import lowest_required_education, required_years
 
 # Single letters / common words: only match their longer aliases ("golang", "c programming")
 AMBIGUOUS = {"go", "c", "r"}
@@ -54,7 +54,7 @@ def analyze_job(job_text: str, extra=()) -> dict:
     return {
         "skills": sorted(extract_skills(job_text, extra)),
         "years": required_years(job_text),
-        "edu_level": education_level(job_text)[0],
+        "edu_level": lowest_required_education(job_text),
     }
 
 

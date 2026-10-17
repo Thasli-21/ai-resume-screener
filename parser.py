@@ -94,6 +94,12 @@ def education_level(text: str):
     return best, LEVEL_LABELS[best]
 
 
+def lowest_required_education(text: str) -> int:
+    """For job descriptions: 'Diploma or bachelor's' means a diploma is enough, so take the lowest level named."""
+    found = [level for level, pattern in _EDU_LEVELS if re.search(pattern, text, re.I)]
+    return min(found) if found else 0
+
+
 # ---------------------------------------------------------------- experience
 _MONTHS = {m: i + 1 for i, m in enumerate(
     ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"])}

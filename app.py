@@ -1,36 +1,29 @@
 """AI Resume Screener v2.  Run with:  python -m streamlit run app.py"""
 import hashlib
 import io
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from PIL import Image
 
+from jobs_db import JOB_PRESETS
 from parser import LEVEL_LABELS, candidate_info, extract_text_from_bytes
 from screener import DEFAULT_WEIGHTS, analyze_job, score_candidate
 
-st.set_page_config(page_title="AI Resume Screener", page_icon="📄", layout="wide")
+# ---- change the name here and it updates everywhere ----
+APP_NAME = "TalentLens"
+TAGLINE = "Upload resumes → extract skills and details → compare with the job → rank candidates"
 
-PRESETS = {
-    "- choose an example job -": "",
-    "Hotel Management Trainee": (
-        "Hotel Management Trainee\n"
-        "Looking for a trainee for front office, housekeeping, food and beverage production and "
-        "service, and guest service.\n"
-        "Candidates should have good english communication, interpersonal skills, attention to "
-        "detail, adaptability and leadership."),
-    "Front Office Executive (2+ yrs)": (
-        "Front Office Executive. 2+ years of experience in hotels.\n"
-        "Skills: front office, reservations, check-in/check-out, guest service, PMS software "
-        "(Opera), upselling, complaint handling, english communication, teamwork.\n"
-        "Diploma or bachelor's degree in hotel management preferred."),
-    "Python Developer (3+ yrs)": (
-        "We are hiring a Python Developer with 3+ years of experience.\n"
-        "Required skills: Python, Django, SQL, Docker, Git, REST API, AWS.\n"
-        "Good communication and teamwork skills needed. Bachelor's degree in computer science."),
-    "Data Analyst (2+ yrs)": (
-        "Data Analyst with 2+ years of experience. Skills: SQL, Python, Excel, Pandas, data "
-        "visualization (Power BI or Tableau), statistics, communication. Bachelor's degree required."),
-}
+try:                                             # logo.png sits next to this file
+    LOGO = Image.open(Path(__file__).parent / "logo.png")
+except Exception:
+    LOGO = None
+
+st.set_page_config(page_title=f"{APP_NAME} | AI Resume Screener",
+                   page_icon=LOGO if LOGO else "📄", layout="wide")
+
+PRESETS = JOB_PRESETS                            # the example jobs live in jobs_db.py
 
 
 @st.cache_data(show_spinner=False)
@@ -84,8 +77,11 @@ cutoffs = (strong_cut, moderate_cut, weak_cut)
 extra = tuple(s.strip().lower() for s in custom_text.split(",") if s.strip())
 
 # ------------------------------------------------------------------ inputs
-st.title("📄 AI Resume Screening System")
-st.caption("Upload resumes → extract skills and details → compare with the job → rank candidates")
+head_logo, head_text = st.columns([1, 12])
+if LOGO:
+    head_logo.image(LOGO, width=80)
+head_text.title(APP_NAME)
+head_text.caption(TAGLINE)
 
 left, right = st.columns(2)
 with left:
@@ -94,7 +90,8 @@ with left:
                              type=["pdf", "docx", "txt"], accept_multiple_files=True)
 with right:
     st.subheader("2. Job description")
-    st.selectbox("Load an example job", list(PRESETS), key="preset", on_change=load_preset)
+    st.selectbox("Load an example job", list(PRESETS), key="preset", on_change=load_preset,
+                 help=f"{len(PRESETS) - 1} example jobs. Click and type to search, e.g. 'nurse' or 'python'.")
     jd = st.text_area("Paste the job description", key="jd", height=200,
                       placeholder="e.g. We need a Python developer with 3+ years of experience "
                                   "in Django, SQL, Docker and AWS...")
